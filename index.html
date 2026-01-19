@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maikou Luxury Asset Verifier</title>
+    <style>
+        /* CSS: Memberikan kesan Luxury (Mewah) */
+        body {
+            background-color: #050505; /* Hitam sangat pekat */
+            color: #d4af37;           /* Warna Emas Standar Maikou */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            border: 2px solid #d4af37;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            width: 80%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        /* Gaya Kotak Input */
+        input {
+            background: #1a1a1a;
+            border: 1px solid #d4af37;
+            color: white;
+            padding: 12px;
+            width: 90%;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            outline: none;
+            text-align: center;
+        }
+
+        button {
+            background-color: #d4af37;
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #f1c40f;
+            transform: scale(1.02);
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>MAIKOU SYSTEM</h1>
+        <p>Enter Asset Serial Number:</p>
+        
+        <input type="text" id="serialInput" placeholder="Contoh: MK-990011">
+        
+        <button onclick="runBlockchainCheck()">VERIFY ASSET</button>
+
+        <div id="result">Ready to Scan...</div>
+    </div>
+
+    <script>
+        /**
+         * LOGIKA FULL STACK (Simulasi Blockchain)
+         * Penjelasan: Fungsi ini mengambil input, memprosesnya, 
+         * dan memberikan output sesuai logika perusahaan.
+         */
+        function runBlockchainCheck() {
+            const input = document.getElementById("serialInput").value;
+            const resultDiv = document.getElementById("result");
+
+            if (input === "") {
+                alert("Please enter a serial number first!");
+                return;
+            }
+
+            // 1. Ubah status menjadi loading
+            resultDiv.innerText = "Searching Blockchain Nodes...";
+            resultDiv.style.color = "white";
+
+            // 2. Simulasi proses verifikasi selama 2 detik
+            setTimeout(() => {
+                // Logika: Jika nomor seri mengandung 'MK', maka dianggap asli
+                if (input.toUpperCase().includes("MK")) {
+                    resultDiv.innerText = "✓ VERIFIED: GENUINE ASSET";
+                    resultDiv.style.color = "#2ecc71"; // Hijau
+                } else {
+                    resultDiv.innerText = "✗ WARNING: UNKNOWN ASSET";
+                    resultDiv.style.color = "#e74c3c"; // Merah
+                }
+            }, 2000);
+        }
+    </script>
+
+</body>
+</html>
