@@ -19,10 +19,19 @@
         button { background: transparent; color: #d4af37; border: 1px solid #d4af37; padding: 12px; cursor: pointer; letter-spacing: 2px; transition: 0.4s; font-weight: bold; }
         button:hover { background: #d4af37; color: black; }
         
-        #certificate { display: none; margin-top: 30px; padding: 25px; border: 10px double #d4af37; background: white; color: #111; animation: goldGlow 1.5s ease-out; }
+        /* Sertifikat - Dioptimasi untuk PDF Hitam */
+        #certificate { 
+            display: none; 
+            margin-top: 30px; 
+            padding: 30px; 
+            border: 8px double #d4af37; 
+            background-color: #0a0a0a; /* Sekarang Hitam */
+            color: #d4af37; /* Tulisan jadi Emas */
+            animation: goldGlow 1.5s ease-out; 
+        }
+        
         #error-msg { display: none; margin-top: 20px; color: #ff4d4d; font-weight: bold; border: 1px solid #ff4d4d; padding: 10px; }
         
-        /* Style Tabel Riwayat */
         #history-section { margin-top: 30px; width: 100%; max-width: 400px; display: none; }
         table { width: 100%; border-collapse: collapse; font-size: 0.7rem; color: #d4af37; border: 1px solid rgba(212, 175, 55, 0.3); }
         th, td { padding: 8px; border: 1px solid rgba(212, 175, 55, 0.2); }
@@ -47,15 +56,15 @@
         <div id="error-msg">INVALID SERIAL: COUNTERFEIT DETECTED</div>
 
         <div id="certificate">
-            <h2 style="margin:0;">CERTIFICATE</h2>
+            <h2 style="margin:0; letter-spacing: 3px;">CERTIFICATE</h2>
             <p style="font-size: 0.7rem; letter-spacing: 2px;">AUTHENTICITY GUARANTEED</p>
-            <hr color="#111">
-            <p>Validated Asset:</p>
-            <h3 id="cert-id" style="color: #b38728; margin: 5px 0;"></h3>
+            <hr color="#d4af37" style="margin: 15px 0;">
+            <p style="font-size: 0.8rem;">Validated Asset:</p>
+            <h3 id="cert-id" style="color: #fcf6ba; margin: 5px 0; font-size: 1.5rem;"></h3>
             <p style="font-size: 0.9rem;">Genuine Maikou Luxury Item</p>
-            <div style="margin-top: 20px; font-family: cursive; border-top: 1px solid #eee;">Maikou Digital Seal</div>
+            <div style="margin-top: 30px; font-family: cursive; border-top: 1px solid rgba(212,175,55,0.3); padding-top: 10px;">Maikou Digital Seal</div>
             
-            <button id="downloadBtn" onclick="downloadPDF()" style="margin-top: 20px; width: 100%; font-size: 0.7rem; border-color: #111; color: #111;">DOWNLOAD OFFICIAL PDF</button>
+            <button id="downloadBtn" onclick="downloadPDF()" style="margin-top: 25px; width: 100%; font-size: 0.7rem; border-color: #d4af37; color: #d4af37;">DOWNLOAD OFFICIAL PDF</button>
         </div>
     </div>
 
@@ -119,18 +128,22 @@
         function downloadPDF() {
             const element = document.getElementById('certificate');
             const btn = document.getElementById('downloadBtn');
-            btn.style.display = 'none'; // Sembunyikan tombol saat proses PDF
+            btn.style.display = 'none'; 
 
             const opt = {
-                margin: 10,
-                filename: 'Maikou_Cert_' + document.getElementById('cert-id').innerText + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
+                margin: 0,
+                filename: 'Maikou_Official_Cert_' + document.getElementById('cert-id').innerText + '.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { 
+                    scale: 3, 
+                    backgroundColor: '#0a0a0a', // Memastikan background PDF hitam
+                    useCORS: true 
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
-                btn.style.display = 'block'; // Tampilkan kembali
+                btn.style.display = 'block';
             });
         }
     </script>
