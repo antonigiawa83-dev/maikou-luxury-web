@@ -3,118 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maikou Luxury Asset Verifier</title>
+    <title>Maikou Luxury Verifier</title>
     <style>
-        /* CSS: Memberikan kesan Luxury (Mewah) */
+        /* CSS: Efek Kemewahan & Animasi */
         body {
-            background-color: #050505; /* Hitam sangat pekat */
-            color: #d4af37;           /* Warna Emas Standar Maikou */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #050505;
+            color: #d4af37;
+            font-family: 'Times New Roman', serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            justify-content: center;
+            min-height: 100vh;
             margin: 0;
+            overflow-x: hidden;
         }
 
         .container {
-            border: 2px solid #d4af37;
-            padding: 30px;
-            border-radius: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 40px;
+            border-radius: 2px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-            width: 80%;
-            max-width: 400px;
+            background: linear-gradient(145deg, #0a0a0a, #111);
+            box-shadow: 0 0 30px rgba(0,0,0,1);
+            transition: all 0.5s ease;
         }
 
         h1 {
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: 300;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Gaya Kotak Input */
         input {
-            background: #1a1a1a;
-            border: 1px solid #d4af37;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #d4af37;
             color: white;
-            padding: 12px;
-            width: 90%;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            outline: none;
+            padding: 10px;
+            width: 250px;
             text-align: center;
+            font-size: 1.1rem;
+            outline: none;
+            margin-bottom: 30px;
         }
 
         button {
-            background-color: #d4af37;
-            color: black;
-            border: none;
-            padding: 12px 25px;
-            font-weight: bold;
-            border-radius: 5px;
+            background: transparent;
+            color: #d4af37;
+            border: 1px solid #d4af37;
+            padding: 12px 40px;
             cursor: pointer;
-            width: 100%;
-            transition: 0.3s;
+            letter-spacing: 2px;
+            transition: 0.4s;
+            position: relative;
+            overflow: hidden;
         }
 
         button:hover {
-            background-color: #f1c40f;
-            transform: scale(1.02);
+            background: #d4af37;
+            color: black;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
         }
 
-        #result {
-            margin-top: 20px;
+        /* Animasi Sertifikat */
+        #certificate {
+            display: none;
+            margin-top: 40px;
+            padding: 20px;
+            border: 5px double #d4af37;
+            background: #fff;
+            color: #111;
+            width: 300px;
+            animation: fadeInGold 1.5s ease forwards;
+            position: relative;
+        }
+
+        @keyframes fadeInGold {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.1;
+            font-size: 4rem;
             font-weight: bold;
-            min-height: 24px;
+            z-index: 0;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>MAIKOU SYSTEM</h1>
-        <p>Enter Asset Serial Number:</p>
+    <div class="container" id="main-box">
+        <h1>Maikou</h1>
+        <p style="font-style: italic; opacity: 0.7;">Asset Authentication Protocol</p>
         
-        <input type="text" id="serialInput" placeholder="Contoh: MK-990011">
-        
-        <button onclick="runBlockchainCheck()">VERIFY ASSET</button>
+        <input type="text" id="serial" placeholder="Enter Serial Code...">
+        <br>
+        <button onclick="verifyProcess()">AUTHENTICATE</button>
 
-        <div id="result">Ready to Scan...</div>
+        <div id="certificate">
+            <div class="watermark">MK</div>
+            <h3 style="margin: 0; border-bottom: 1px solid #111;">CERTIFICATE</h3>
+            <p style="font-size: 0.8rem;">OF AUTHENTICITY</p>
+            <p style="margin-top: 20px; font-weight: bold;">SERIAL VERIFIED:</p>
+            <p id="cert-id" style="letter-spacing: 2px;"></p>
+            <p style="font-size: 0.7rem; margin-top: 20px;">MAIKOU GENUINE BLOCKCHAIN ASSET</p>
+        </div>
     </div>
 
     <script>
-        /**
-         * LOGIKA FULL STACK (Simulasi Blockchain)
-         * Penjelasan: Fungsi ini mengambil input, memprosesnya, 
-         * dan memberikan output sesuai logika perusahaan.
-         */
-        function runBlockchainCheck() {
-            const input = document.getElementById("serialInput").value;
-            const resultDiv = document.getElementById("result");
+        function verifyProcess() {
+            const code = document.getElementById('serial').value;
+            const cert = document.getElementById('certificate');
+            const certId = document.getElementById('cert-id');
 
-            if (input === "") {
-                alert("Please enter a serial number first!");
-                return;
-            }
+            if(!code) return alert("Please enter a serial number.");
 
-            // 1. Ubah status menjadi loading
-            resultDiv.innerText = "Searching Blockchain Nodes...";
-            resultDiv.style.color = "white";
+            // Reset view
+            cert.style.display = "none";
 
-            // 2. Simulasi proses verifikasi selama 2 detik
+            // Simulasi proses mewah
+            let btn = document.querySelector('button');
+            btn.innerText = "VERIFYING...";
+            
             setTimeout(() => {
-                // Logika: Jika nomor seri mengandung 'MK', maka dianggap asli
-                if (input.toUpperCase().includes("MK")) {
-                    resultDiv.innerText = "✓ VERIFIED: GENUINE ASSET";
-                    resultDiv.style.color = "#2ecc71"; // Hijau
-                } else {
-                    resultDiv.innerText = "✗ WARNING: UNKNOWN ASSET";
-                    resultDiv.style.color = "#e74c3c"; // Merah
-                }
+                btn.innerText = "AUTHENTICATED";
+                certId.innerText = code.toUpperCase();
+                cert.style.display = "block";
+                
+                // Tambahan suara klik atau getaran jika diperlukan di masa depan
+                console.log("Maikou Asset " + code + " has been logged.");
             }, 2000);
         }
     </script>
-
 </body>
 </html>
