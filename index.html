@@ -5,25 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maikou Luxury Protocol</title>
+    
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
-        body { background-color: #050505; color: #d4af37; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .container { border: 1px solid rgba(212, 175, 55, 0.3); padding: 30px; border-radius: 2px; background: linear-gradient(145deg, #0a0a0a, #111); max-width: 400px; width: 100%; box-shadow: 0 0 50px rgba(0,0,0,1); margin-top: 20px; }
-        h1 { letter-spacing: 5px; text-transform: uppercase; background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0; }
+        body { background-color: #050505; color: #d4af37; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; text-align: center; }
+        .container { border: 1px solid rgba(212, 175, 55, 0.3); padding: 30px; border-radius: 2px; background: linear-gradient(145deg, #0a0a0a, #111); max-width: 400px; width: 100%; box-shadow: 0 0 50px rgba(0,0,0,1); }
+        h1 { letter-spacing: 5px; text-transform: uppercase; background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         #reader { width: 100%; margin-top: 20px; border: 1px solid #d4af37; display: none; }
         input { background: transparent; border: none; border-bottom: 1px solid #d4af37; color: white; padding: 10px; width: 80%; text-align: center; margin: 20px 0; outline: none; font-size: 1.1rem; }
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
         button { background: transparent; color: #d4af37; border: 1px solid #d4af37; padding: 12px; cursor: pointer; letter-spacing: 2px; transition: 0.4s; font-weight: bold; }
-        button:hover { background: #d4af37; color: black; box-shadow: 0 0 15px #d4af37; }
+        button:hover { background: #d4af37; color: black; }
+        
         #certificate { display: none; margin-top: 30px; padding: 25px; border: 10px double #d4af37; background: white; color: #111; animation: goldGlow 1.5s ease-out; }
-        #error-msg { display: none; margin-top: 20px; color: #ff4d4d; font-weight: bold; border: 1px solid #ff4d4d; padding: 10px; animation: shake 0.5s; }
-        @keyframes goldGlow { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        #error-msg { display: none; margin-top: 20px; color: #ff4d4d; font-weight: bold; border: 1px solid #ff4d4d; padding: 10px; }
         
         /* Style Tabel Riwayat */
         #history-section { margin-top: 30px; width: 100%; max-width: 400px; display: none; }
         table { width: 100%; border-collapse: collapse; font-size: 0.7rem; color: #d4af37; border: 1px solid rgba(212, 175, 55, 0.3); }
-        th, td { padding: 8px; border: 1px solid rgba(212, 175, 55, 0.2); text-align: center; }
+        th, td { padding: 8px; border: 1px solid rgba(212, 175, 55, 0.2); }
+
+        @keyframes goldGlow { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -31,13 +35,17 @@
     <div class="container">
         <h1>MAIKOU</h1>
         <p style="font-style: italic; font-size: 0.8rem; opacity: 0.6;">Blockchain-Back End Verification</p>
+
         <div id="reader"></div>
         <input type="text" id="serial" placeholder="Enter Serial Code...">
+
         <div class="btn-group">
             <button onclick="startScan()">SCAN QR CODE</button>
             <button onclick="verifyProcess()">VERIFY AUTHENTICITY</button>
         </div>
+
         <div id="error-msg">INVALID SERIAL: COUNTERFEIT DETECTED</div>
+
         <div id="certificate">
             <h2 style="margin:0;">CERTIFICATE</h2>
             <p style="font-size: 0.7rem; letter-spacing: 2px;">AUTHENTICITY GUARANTEED</p>
@@ -45,7 +53,9 @@
             <p>Validated Asset:</p>
             <h3 id="cert-id" style="color: #b38728; margin: 5px 0;"></h3>
             <p style="font-size: 0.9rem;">Genuine Maikou Luxury Item</p>
-            <div style="margin-top: 20px; font-family: cursive;">Maikou Digital Seal</div>
+            <div style="margin-top: 20px; font-family: cursive; border-top: 1px solid #eee;">Maikou Digital Seal</div>
+            
+            <button id="downloadBtn" onclick="downloadPDF()" style="margin-top: 20px; width: 100%; font-size: 0.7rem; border-color: #111; color: #111;">DOWNLOAD OFFICIAL PDF</button>
         </div>
     </div>
 
@@ -74,7 +84,7 @@
                 html5QrCode.stop();
                 document.getElementById('reader').style.display = 'none';
                 verifyProcess();
-            });
+            }).catch(err => alert("Camera error: " + err));
         }
 
         function updateHistory(serial, isSuccess) {
@@ -104,6 +114,24 @@
                 error.style.display = 'block';
                 updateHistory(input, false);
             }
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('certificate');
+            const btn = document.getElementById('downloadBtn');
+            btn.style.display = 'none'; // Sembunyikan tombol saat proses PDF
+
+            const opt = {
+                margin: 10,
+                filename: 'Maikou_Cert_' + document.getElementById('cert-id').innerText + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.style.display = 'block'; // Tampilkan kembali
+            });
         }
     </script>
 </body>
