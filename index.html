@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,21 +7,23 @@
     <title>Maikou Luxury Protocol</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { background-color: #050505; color: #d4af37; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; text-align: center; }
-        .container { border: 1px solid rgba(212, 175, 55, 0.3); padding: 30px; border-radius: 2px; background: linear-gradient(145deg, #0a0a0a, #111); max-width: 400px; width: 100%; box-shadow: 0 0 50px rgba(0,0,0,1); }
-        h1 { letter-spacing: 5px; text-transform: uppercase; background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        body { background-color: #050505; color: #d4af37; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { border: 1px solid rgba(212, 175, 55, 0.3); padding: 30px; border-radius: 2px; background: linear-gradient(145deg, #0a0a0a, #111); max-width: 400px; width: 100%; box-shadow: 0 0 50px rgba(0,0,0,1); margin-top: 20px; }
+        h1 { letter-spacing: 5px; text-transform: uppercase; background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0; }
         #reader { width: 100%; margin-top: 20px; border: 1px solid #d4af37; display: none; }
         input { background: transparent; border: none; border-bottom: 1px solid #d4af37; color: white; padding: 10px; width: 80%; text-align: center; margin: 20px 0; outline: none; font-size: 1.1rem; }
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
         button { background: transparent; color: #d4af37; border: 1px solid #d4af37; padding: 12px; cursor: pointer; letter-spacing: 2px; transition: 0.4s; font-weight: bold; }
         button:hover { background: #d4af37; color: black; box-shadow: 0 0 15px #d4af37; }
-        
-        /* Sertifikat & Pesan Error */
         #certificate { display: none; margin-top: 30px; padding: 25px; border: 10px double #d4af37; background: white; color: #111; animation: goldGlow 1.5s ease-out; }
         #error-msg { display: none; margin-top: 20px; color: #ff4d4d; font-weight: bold; border: 1px solid #ff4d4d; padding: 10px; animation: shake 0.5s; }
-        
-        @keyframes goldGlow { from { opacity: 0; transform: translateY(20px); box-shadow: 0 0 0px #d4af37; } to { opacity: 1; transform: translateY(0); box-shadow: 0 0 30px #d4af37; } }
+        @keyframes goldGlow { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        
+        /* Style Tabel Riwayat */
+        #history-section { margin-top: 30px; width: 100%; max-width: 400px; display: none; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; color: #d4af37; border: 1px solid rgba(212, 175, 55, 0.3); }
+        th, td { padding: 8px; border: 1px solid rgba(212, 175, 55, 0.2); text-align: center; }
     </style>
 </head>
 <body>
@@ -28,35 +31,39 @@
     <div class="container">
         <h1>MAIKOU</h1>
         <p style="font-style: italic; font-size: 0.8rem; opacity: 0.6;">Blockchain-Back End Verification</p>
-
         <div id="reader"></div>
         <input type="text" id="serial" placeholder="Enter Serial Code...">
-
         <div class="btn-group">
             <button onclick="startScan()">SCAN QR CODE</button>
             <button onclick="verifyProcess()">VERIFY AUTHENTICITY</button>
         </div>
-
         <div id="error-msg">INVALID SERIAL: COUNTERFEIT DETECTED</div>
-
         <div id="certificate">
             <h2 style="margin:0;">CERTIFICATE</h2>
             <p style="font-size: 0.7rem; letter-spacing: 2px;">AUTHENTICITY GUARANTEED</p>
             <hr color="#111">
             <p>Validated Asset:</p>
             <h3 id="cert-id" style="color: #b38728; margin: 5px 0;"></h3>
-            <p style="font-size: 0.9rem;">Genuine Maikou Luxury Chrono</p>
+            <p style="font-size: 0.9rem;">Genuine Maikou Luxury Item</p>
             <div style="margin-top: 20px; font-family: cursive;">Maikou Digital Seal</div>
         </div>
+    </div>
+
+    <div id="history-section">
+        <h3 style="font-size: 0.8rem; letter-spacing: 2px;">VERIFICATION LOGS</h3>
+        <table>
+            <thead>
+                <tr><th>TIME</th><th>SERIAL</th><th>STATUS</th></tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+        </table>
     </div>
 
     <audio id="soundSuccess" src="https://www.soundjay.com/buttons/sounds/button-37a.mp3"></audio>
     <audio id="soundFail" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
 
     <script>
-        // Database Sederhana: Daftar Kode yang Dianggap Asli
         const validSerials = ["MK-GOLD-001", "MK-SILVER-99", "MK-CHRONO-2026", "ANTONI-DEV"];
-
         let html5QrCode;
 
         function startScan() {
@@ -70,25 +77,32 @@
             });
         }
 
+        function updateHistory(serial, isSuccess) {
+            document.getElementById('history-section').style.display = 'block';
+            const body = document.getElementById('history-body');
+            const row = body.insertRow(0);
+            const now = new Date().toLocaleTimeString();
+            row.innerHTML = `<td>${now}</td><td>${serial}</td><td style="color:${isSuccess?'#0f0':'#f44'}">${isSuccess?'GENUINE':'FAKE'}</td>`;
+        }
+
         function verifyProcess() {
             const input = document.getElementById('serial').value.toUpperCase();
+            if(!input) return;
             const cert = document.getElementById('certificate');
             const error = document.getElementById('error-msg');
-            const soundSuccess = document.getElementById('soundSuccess');
-            const soundFail = document.getElementById('soundFail');
-
-            // Reset Tampilan
+            
             cert.style.display = "none";
             error.style.display = "none";
 
-            // Validasi Database
             if (validSerials.includes(input)) {
-                soundSuccess.play(); // Efek Suara Berhasil
+                document.getElementById('soundSuccess').play();
                 document.getElementById('cert-id').innerText = input;
                 cert.style.display = 'block';
+                updateHistory(input, true);
             } else {
-                soundFail.play(); // Efek Suara Gagal
+                document.getElementById('soundFail').play();
                 error.style.display = 'block';
+                updateHistory(input, false);
             }
         }
     </script>
