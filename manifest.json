@@ -1,0 +1,16 @@
+{
+  "name": "Maikou Luxury Protocol",
+  "short_name": "Maikou",
+  "description": "Digital Authenticity System for Luxury Items",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#d4af37",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1063/1063302.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
